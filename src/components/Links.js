@@ -1,22 +1,29 @@
 import React, { useEffect, useState } from "react";
 import LinkForm from "./LinkForm";
 import { db } from "../firebase";
-import { collection, addDoc, getDocs, deleteDoc, doc } from "firebase/firestore";
+import { collection, addDoc, getDocs, deleteDoc, doc, getDoc, updateDoc } from "firebase/firestore";
 import { toast } from 'react-toastify';
 const Links = () => {
 
     const addOrEditLink = async (linkObject) => {
         // console.log(linkObject)
-        await addDoc(collection(db, "links"), linkObject)
-        toast.success("new task added", {
-            position: "bottom-center",
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-        })
+        if (currentId === "") {
+            await addDoc(collection(db, "links"), linkObject)
+            toast.success("new task added", {
+                position: "bottom-center",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            })
+        } else {
+            let aux = doc(db, "links", currentId)
+            await updateDoc(aux, linkObject)
+            alert("Link Updated Successfully")
+            setCurrentId("")
+        }
     }
 
     const getLinks = async () => {
@@ -58,7 +65,7 @@ const Links = () => {
         <div>
             <div className="col-md-8 p-2">
                 {/* <LinkForm addOrEditLink={addOrEditLink} /> */}
-                <LinkForm {...{addOrEditLink, currentId,links}} />
+                <LinkForm {...{ addOrEditLink, currentId, links }} />
             </div>
             <div className="col-md-8 p-2">
                 {links.map(link => (

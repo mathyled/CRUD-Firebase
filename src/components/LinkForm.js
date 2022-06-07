@@ -1,4 +1,6 @@
+import { collection, doc, getDoc, getDocs } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
+import { db } from "../firebase";
 
 const LinkForm = (props) => {
     const initialStateValues = {
@@ -22,14 +24,16 @@ const LinkForm = (props) => {
     }
 
 
-    const getLinkById = ()=>{
-        
+    const getLinkById = async(id)=>{
+      let docs = await getDoc(doc(db,"links",id))
+      //console.log(docs.data())
+      setValues({...docs.data()})
     }
     useEffect(()=>{
         if(props.currentId===""){
             setValues({...initialStateValues})
         }else{
-            console.log(props.currentId)
+            getLinkById(props.currentId)
         }
     },[props.currentId])
     return (
@@ -74,7 +78,7 @@ const LinkForm = (props) => {
                 className="btn btn-primary btn-block"
                 onClick={handlerSubmit}
             >
-                Save
+              {props.currentId === "" ? "Save" : "Update"}
             </button>
         </form>
     )
